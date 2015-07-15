@@ -1,0 +1,25 @@
+{
+  "name": "cordova-plugin-join-images",
+  "version": "0.0.1",
+  "description": "Join Images Cordova Plugin",
+  "cordova": {
+    "id": "cordova-plugin-join-images",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sarahgoldman/cordova-plugin-join-images"
+  },
+  "keywords": [
+    "cordova",
+    "cordova-ios",
+    "image",
+    "join",
+	"merge",
+	"photo"
+  ],
+  "author": "Sarah Goldman",
+  "license": "MIT"
+}

@@ -12,26 +12,38 @@
 
 @interface JoinImages ()
 
-@property (readwrite, assign) BOOL hasPendingOperation;
+@property (nonatomic, copy) UIImage *leftImage;
+@property (nonatomic, copy) UIImage *rightImage;
 
--(void)joinImages:(CDVInvokedUrlCommand*)command;
+@property (readwrite, assign) BOOL hasPendingOperation;
 
 -(UIImage *)getImageWithURLString:(NSString*)urlString;
 -(UIImage *)getImageWithDataString:(NSString*)dataString;
+-(void)joinImages:(CDVInvokedUrlCommand*)command;
 
 @end
 
 @implementation JoinImages
 
+@synthesize leftImage, rightImage;
+
 -(void)joinImagesWithData:(CDVInvokedUrlCommand *)command
 {
-    
+    //Fetch images from data string arguments...
+    self.leftImage = [self getImageWithDataString:[command.arguments objectAtIndex:0]];
+    self.rightImage = [self getImageWithDataString:[command.arguments objectAtIndex:1]];
+    [self joinImages:command];
 }
 
 -(void)joinImagesWithURLs:(CDVInvokedUrlCommand *)command
 {
-    
+    //Fetch images from url string arguments...
+    self.leftImage = [self getImageWithURLString:[command.arguments objectAtIndex:0]];
+    self.rightImage = [self getImageWithURLString:[command.arguments objectAtIndex:1]];
+    [self joinImages:command];
 }
+
+
 
 -(UIImage *)getImageWithURLString:(NSString*)urlString
 {
@@ -49,6 +61,7 @@
 
 -(void)joinImages:(CDVInvokedUrlCommand*)command
 {
+    
     // Set the hasPendingOperation field to prevent the webview from crashing
     self.hasPendingOperation = YES;
     
@@ -65,12 +78,8 @@
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     
-    //Fetch images from arguments...
-    UIImage *leftImage = [self getImageWithURLString:[command.arguments objectAtIndex:0]];
-    UIImage *rightImage = [self getImageWithURLString:[command.arguments objectAtIndex:1]];
-    
     //Check for success of loading images.
-    if (leftImage == nil || rightImage == nil) {
+    if (self.leftImage == nil || self.rightImage == nil) {
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"At least one image could not load."] callbackId:command.callbackId];
         
         // Unset the self.hasPendingOperation property
@@ -80,7 +89,7 @@
     }
     
     //Stitch images together...
-    UIImage* merged = [ImageService mergeImage:leftImage withImage:rightImage];
+    UIImage* merged = [ImageService mergeImage:self.leftImage withImage:self.rightImage];
     
     //Resize the image to be under 5MB
     merged = [ImageService resizeImage:merged withSizeInMB:5.0];
@@ -106,5 +115,6 @@
     // Unset the self.hasPendingOperation property
     self.hasPendingOperation = NO;
 }
+
 
 @end

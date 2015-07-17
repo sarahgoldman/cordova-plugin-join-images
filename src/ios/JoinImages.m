@@ -65,8 +65,8 @@
     // Set the hasPendingOperation field to prevent the webview from crashing
     self.hasPendingOperation = YES;
     
-    if (command.arguments.count < 3) {
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Need 2 images and a filename"] callbackId:command.callbackId];
+    if (command.arguments.count < 2) {
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Need 2 images"] callbackId:command.callbackId];
         
         // Unset the self.hasPendingOperation property
         self.hasPendingOperation = NO;

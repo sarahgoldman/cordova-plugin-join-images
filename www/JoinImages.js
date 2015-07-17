@@ -21,11 +21,11 @@ module.exports = {
 		this.errorCallback = (options.error && typeof(options.error) === 'function') ? options.error : null;
 		
 		// make sure both images and the final file name are set	
-		if (!this.type || !this.leftImage || !this.rightImage || !this.destination) {
+		if (!this.type || !this.leftImage || !this.rightImage) {
 			if (this.errorCallback) {
 				this.errorCallback({
 					success: false,
-					error: "Parameters 'type', 'leftImage', 'rightImage', and 'destination' are required."
+					error: "Parameters 'type', 'leftImage', and 'rightImage' are required."
 				});
 			}
 			return false;

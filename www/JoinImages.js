@@ -1,13 +1,13 @@
 module.exports = {
 	
-	URL_TYPE: 'url',
-	BASE64_TYPE: 'base64',
-	URL_IOS_METHOD: 'joinImagesWithURLs',
-	BASE64_IOS_METHOD: 'joinImagesWithData',
-	
 	join: function(options){
 		
 		options = options || {};
+		
+		this.URL_TYPE: 'url',
+		this.BASE64_TYPE: 'base64',
+		this.URL_IOS_METHOD: 'joinImagesWithURLs',
+		this.BASE64_IOS_METHOD: 'joinImagesWithData',
 		
 		this.type = options.type; // type, either url or base64 (required)
 		

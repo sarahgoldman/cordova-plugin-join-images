@@ -15,7 +15,7 @@ module.exports = {
 
 		this.rightImage = options.rightImage; // right image file path (required)
 		
-		this.size = (options.size && options.size > 0) ? options.size || 5.0; // file output size in MB, default to 5MB
+		this.size = (options.size && options.size > 0) ? options.size : 5; // file output size in MB, default to 5MB
 		
 		// make sure callbacks are functions or reset to null
 		this.successCallback = (options.success && typeof(options.success) === 'function') ? options.success : null; 

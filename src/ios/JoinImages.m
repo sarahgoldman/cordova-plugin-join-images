@@ -33,7 +33,7 @@
     NSString* firstFilePath =[command.arguments objectAtIndex:0];
     UIImage * imageOne = [UIImage imageWithContentsOfFile:firstFilePath];
     
-    NSString* secondFilePath = [command.arguments objectAtIndex:0];
+    NSString* secondFilePath = [command.arguments objectAtIndex:1];
     UIImage * imageTwo = [UIImage imageWithContentsOfFile:secondFilePath];
     
     //Check for success of loading images.

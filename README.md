@@ -1,2 +1,2 @@
-Join Images plugin for Cordova / PhoneGap
+Join Images plugin for Cordova
 ======================================================

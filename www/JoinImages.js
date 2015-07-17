@@ -1,9 +1,9 @@
 module.exports = {
 	
-	this.URL_TYPE = 'url';
-	this.BASE64_TYPE = 'base64';
-	this.URL_IOS_METHOD = 'joinImagesWithURLs';
-	this.BASE64_IOS_METHOD = 'joinImagesWithData';
+	URL_TYPE: 'url',
+	BASE64_TYPE: 'base64',
+	URL_IOS_METHOD: 'joinImagesWithURLs',
+	BASE64_IOS_METHOD: 'joinImagesWithData',
 	
 	join: function(options){
 		

@@ -1,8 +1,15 @@
 module.exports = {
 	
+	this.URL_TYPE = 'url';
+	this.BASE64_TYPE = 'base64';
+	this.URL_IOS_METHOD = 'joinImagesWithURLs';
+	this.BASE64_IOS_METHOD = 'joinImagesWithData';
+	
 	join: function(options){
 		
 		options = options || {};
+		
+		this.type = options.type; // type, either url or base64 (required)
 		
 		this.leftImage = options.leftImage; // left image file path (required)
 
@@ -16,11 +23,22 @@ module.exports = {
 		this.errorCallback = (options.error && typeof(options.error) === 'function') ? options.error : null;
 		
 		// make sure both images and the final file name are set	
-		if (!this.leftImage || !this.rightImage || !this.destination) {
+		if (!this.type || !this.leftImage || !this.rightImage || !this.destination) {
 			if (this.errorCallback) {
 				this.errorCallback({
 					success: false,
-					error: "Parameters 'leftImage', 'rightImage', and 'destination' are required."
+					error: "Parameters 'type', 'leftImage', 'rightImage', and 'destination' are required."
+				});
+			}
+			return false;
+		}
+		
+		// make sure type is one of the two defined types
+		if (this.type !== this.URL_TYPE && this.type !== this.BASE64_TYPE) {
+			if (this.errorCallback) {
+				this.errorCallback({
+					success: false,
+					error: "Parameter 'type' must be 'url' or 'base64'."
 				});
 			}
 			return false;
@@ -29,8 +47,11 @@ module.exports = {
 		// arguments for ios method
 		var args = [this.leftImage, this.rightImage, this.destination]; 
 		
+		// depending on the type of data, set the appropriate ios method to call
+		var method = (this.type === this.URL_TYPE) ? this.URL_IOS_METHOD : this.BASE64_IOS_METHOD;
+		
 		// make the call
-        cordova.exec(this.successCallback, this.errorCallback, 'JoinImages', 'joinImages', args);
+        cordova.exec(this.successCallback, this.errorCallback, 'JoinImages', method, args);
 
 	}
 	

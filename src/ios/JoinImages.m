@@ -6,10 +6,46 @@
 //
 //
 
+#import "NSData+Base64.h"
 #import "JoinImages.h"
 #import "ImageService.h"
 
+@interface JoinImages ()
+
+@property (readwrite, assign) BOOL hasPendingOperation;
+
+-(void)joinImages:(CDVInvokedUrlCommand*)command;
+
+-(UIImage *)getImageWithURLString:(NSString*)urlString;
+-(UIImage *)getImageWithDataString:(NSString*)dataString;
+
+@end
+
 @implementation JoinImages
+
+-(void)joinImagesWithData:(CDVInvokedUrlCommand *)command
+{
+    
+}
+
+-(void)joinImagesWithURLs:(CDVInvokedUrlCommand *)command
+{
+    
+}
+
+-(UIImage *)getImageWithURLString:(NSString*)urlString
+{
+    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlString]];
+    UIImage *image = [UIImage imageWithData:imageData];
+    return image;
+}
+
+-(UIImage *)getImageWithDataString:(NSString*)dataString
+{
+    NSData *imageData = [NSData dataFromBase64String:dataString];
+    UIImage *image = [UIImage imageWithData:imageData];
+    return image;
+}
 
 -(void)joinImages:(CDVInvokedUrlCommand*)command
 {
@@ -26,18 +62,15 @@
     }
     
     //Get Documents Directory
-    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString* documentsDirectory = [paths objectAtIndex:0];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
     
     //Fetch images from arguments...
-    NSString* firstFilePath =[command.arguments objectAtIndex:0];
-    UIImage * imageOne = [UIImage imageWithContentsOfFile:firstFilePath];
-    
-    NSString* secondFilePath = [command.arguments objectAtIndex:1];
-    UIImage * imageTwo = [UIImage imageWithContentsOfFile:secondFilePath];
+    UIImage *leftImage = [self getImageWithURLString:[command.arguments objectAtIndex:0]];
+    UIImage *rightImage = [self getImageWithURLString:[command.arguments objectAtIndex:1]];
     
     //Check for success of loading images.
-    if (imageOne == nil || imageTwo == nil) {
+    if (leftImage == nil || rightImage == nil) {
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"At least one image could not load."] callbackId:command.callbackId];
         
         // Unset the self.hasPendingOperation property
@@ -47,7 +80,7 @@
     }
     
     //Stitch images together...
-    UIImage* merged = [ImageService mergeImage:imageOne withImage:imageTwo];
+    UIImage* merged = [ImageService mergeImage:leftImage withImage:rightImage];
     
     //Resize the image to be under 5MB
     merged = [ImageService resizeImage:merged withSizeInMB:5.0];

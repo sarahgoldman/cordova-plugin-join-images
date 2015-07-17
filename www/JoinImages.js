@@ -1,71 +1,97 @@
 module.exports = {
 	
+	// internals
+	URL: 'url',
+	BASE64: 'base64',
+	IOS_CLASS: 'JoinImages',
+	IOS_JOIN_METHOD_URL: 'joinImagesWithURLs',
+	IOS_JOIN_METHOD_BASE64: 'joinImagesWithData',
+	IOS_RESIZE_METHOD_URL: 'resizeImageFromURL',
+	IOS_RESIZE_METHOD_BASE64: 'resizeImageFromData',
+	
 	join: function(options){
 		
 		options = options || {};
 		
-		// internals
-		this.URL_TYPE = 'url';
-		this.BASE64_TYPE = 'base64';
-		this.URL_IOS_JOIN_METHOD = 'joinImagesWithURLs';
-		this.BASE64_IOS_JOIN_METHOD = 'joinImagesWithData';
-		this.URL_IOS_RESIZE_METHOD = 'resizeImageFromURL';
-		this.BASE64_IOS_RESIZE_METHOD = 'resizeImageFromData';
-		this.isJoin = false;
-		
 		// options
-		this.type = options.type; // type, either url or base64 (required)
+		this.sourceType = options.sourceType; // source type, either url or base64 (required)
 		
-		this.firstImage = options.firstImage; // first image file path (required)
+		this.firstImage = options.firstImage; // first image data or url string (required)
 
-		this.secondImage = options.secondImage; // second image file path
+		this.secondImage = options.secondImage; // second image data or url string (required)
 		
-		this.size = (options.size && options.size > 0) ? options.size : 5; // file output size in MB, default to 5MB
+		this.size = (options.size && options.size > 0) ? options.size : 5; // file output size (MB), default to 5
 		
 		// make sure callbacks are functions or reset to null
 		this.successCallback = (options.success && typeof(options.success) === 'function') ? options.success : null; 
 
 		this.errorCallback = (options.error && typeof(options.error) === 'function') ? options.error : null;
 		
-		// make sure both images and the final file name are set	
-		if (!this.type || !this.firstImage) {
+		// make sure the source type and images are set	
+		if (!this.sourceType || !this.firstImage || !this.secondImage) {
 			if (this.errorCallback) {
-				this.errorCallback({
-					success: false,
-					error: "Parameters 'type' and 'firstImage' are required."
-				});
+				this.errorCallback("Parameters 'sourceType', 'firstImage' and 'secondImage' are required.");
 			}
 			return false;
 		}
 		
-		// make sure type is one of the two defined types
-		if (this.type !== this.URL_TYPE && this.type !== this.BASE64_TYPE) {
+		// make sure source type is one of the two defined types
+		if (this.sourceType !== this.URL && this.sourceType !== this.BASE64) {
 			if (this.errorCallback) {
-				this.errorCallback({
-					success: false,
-					error: "Parameter 'type' must be 'url' or 'base64'."
-				});
+				this.errorCallback("Parameter 'sourceType' must be 'url' or 'base64'.");
 			}
 			return false;
 		}
 		
-		var method, args;
-		
-		// if there's a second image...
-		if (this.secondImage) {
-			// use one of the join methods
-			method = (this.type === this.URL_TYPE) ? this.URL_IOS_JOIN_METHOD : this.BASE64_IOS_JOIN_METHOD;
-			// pass both images and the size
-			args = [this.firstImage, this.secondImage, this.size];
-		} else {
-			// use one of the resize methods
-			method = (this.type === this.URL_TYPE) ? this.URL_IOS_RESIZE_METHOD : this.BASE64_IOS_RESIZE_METHOD;
-			// pass one image and the size
-			args = [this.firstImage, this.size];
-		}
+		// use one of the join methods based on the source type
+		var	method = (this.sourceType === this.URL) ? this.IOS_JOIN_METHOD_URL : this.IOS_JOIN_METHOD_BASE64;
+		// pass both images and the size
+		var	args = [this.firstImage, this.secondImage, this.size];
 		
 		// make the call
-        cordova.exec(this.successCallback, this.errorCallback, 'JoinImages', method, args);
+        cordova.exec(this.successCallback, this.errorCallback, this.IOS_CLASS, method, args);
+
+	},
+	
+	resize: function(options){
+		
+		options = options || {};
+		
+		// options
+		this.sourceType = options.sourceType; // source type, either url or base64 (required)
+		
+		this.firstImage = options.firstImage; // image data or url string (required)
+		
+		this.size = (options.size && options.size > 0) ? options.size : 5; // file output size (MB), default to 5
+		
+		// make sure callbacks are functions or reset to null
+		this.successCallback = (options.success && typeof(options.success) === 'function') ? options.success : null; 
+
+		this.errorCallback = (options.error && typeof(options.error) === 'function') ? options.error : null;
+		
+		// make sure the source type and image are set	
+		if (!this.sourceType || !this.image) {
+			if (this.errorCallback) {
+				this.errorCallback("Parameters 'sourceType' and 'image' are required.");
+			}
+			return false;
+		}
+		
+		// make sure source type is one of the two defined types
+		if (this.sourceType !== this.URL && this.sourceType !== this.BASE64) {
+			if (this.errorCallback) {
+				this.errorCallback("Parameter 'sourceType' must be 'url' or 'base64'.");
+			}
+			return false;
+		}
+		
+		// use one of the resize methods based on the source type
+		var	method = (this.sourceType === this.URL) ? this.IOS_RESIZE_METHOD_URL : this.IOS_RESIZE_METHOD_BASE64;
+		// pass first image and the size
+		var	args = [this.firstImage, this.size];
+		
+		// make the call
+        cordova.exec(this.successCallback, this.errorCallback, this.IOS_CLASS, method, args);
 
 	}
 	

@@ -12,38 +12,100 @@
 
 @interface JoinImages ()
 
-@property (nonatomic, copy) UIImage *leftImage;
-@property (nonatomic, copy) UIImage *rightImage;
-
 @property (readwrite, assign) BOOL hasPendingOperation;
 
 -(UIImage *)getImageWithURLString:(NSString*)urlString;
 -(UIImage *)getImageWithDataString:(NSString*)dataString;
--(void)joinImages:(CDVInvokedUrlCommand*)command;
+-(NSString *)resizeAndEncodeImage:(UIImage *)image withSize:(float)size;
 
 @end
 
 @implementation JoinImages
 
-@synthesize leftImage, rightImage;
-
 -(void)joinImagesWithData:(CDVInvokedUrlCommand *)command
 {
+    
+    self.hasPendingOperation = YES;
+    
     //Fetch images from data string arguments...
-    self.leftImage = [self getImageWithDataString:[command.arguments objectAtIndex:0]];
-    self.rightImage = [self getImageWithDataString:[command.arguments objectAtIndex:1]];
-    [self joinImages:command];
+    UIImage *leftImage = [self getImageWithDataString:[command.arguments objectAtIndex:0]];
+    UIImage *rightImage = [self getImageWithDataString:[command.arguments objectAtIndex:1]];
+    float size = [[command.arguments objectAtIndex:2] floatValue];
+    
+    //Stitch images together...
+    UIImage* joined = [ImageService mergeImage:leftImage withImage:rightImage];
+    
+    //Resize and encode
+    NSString *encodedImage = [self resizeAndEncodeImage:joined withSize:size];
+    
+    // return encoded joinedImage
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:encodedImage] callbackId:command.callbackId];
+    
+    // Unset the self.hasPendingOperation property
+    self.hasPendingOperation = NO;
+    
 }
 
 -(void)joinImagesWithURLs:(CDVInvokedUrlCommand *)command
 {
-    //Fetch images from url string arguments...
-    self.leftImage = [self getImageWithURLString:[command.arguments objectAtIndex:0]];
-    self.rightImage = [self getImageWithURLString:[command.arguments objectAtIndex:1]];
-    [self joinImages:command];
+    self.hasPendingOperation = YES;
+    
+    //Fetch images from data string arguments...
+    UIImage *leftImage = [self getImageWithURLString:[command.arguments objectAtIndex:0]];
+    UIImage *rightImage = [self getImageWithURLString:[command.arguments objectAtIndex:1]];
+    float size = [[command.arguments objectAtIndex:2] floatValue];
+    
+    //Stitch images together...
+    UIImage* joined = [ImageService mergeImage:leftImage withImage:rightImage];
+    
+    //Resize and encode
+    NSString *encodedImage = [self resizeAndEncodeImage:joined withSize:size];
+    
+    // return encoded joinedImage
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:encodedImage] callbackId:command.callbackId];
+    
+    // Unset the self.hasPendingOperation property
+    self.hasPendingOperation = NO;
+    
 }
 
+-(void)resizeImageFromURL:(CDVInvokedUrlCommand *)command
+{
+    self.hasPendingOperation = YES;
+    
+    //Fetch image from url string arguments...
+    UIImage *image = [self getImageWithURLString:[command.arguments objectAtIndex:0]];
+    float size = [[command.arguments objectAtIndex:1] floatValue];
+    
+    //Resize and encode
+    NSString *encodedImage = [self resizeAndEncodeImage:image withSize:size];
+    
+    // return encoded image
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:encodedImage] callbackId:command.callbackId];
+    
+    // Unset the self.hasPendingOperation property
+    self.hasPendingOperation = NO;
+}
 
+-(void)resizeImageFromData:(CDVInvokedUrlCommand *)command
+{
+    self.hasPendingOperation = YES;
+    
+    //Fetch image from url string arguments...
+    UIImage *image = [self getImageWithDataString:[command.arguments objectAtIndex:0]];
+    float size = [[command.arguments objectAtIndex:1] floatValue];
+    
+    //Resize and encode
+    NSString *encodedImage = [self resizeAndEncodeImage:image withSize:size];
+    
+    // return encoded image
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:encodedImage] callbackId:command.callbackId];
+    
+    // Unset the self.hasPendingOperation property
+    self.hasPendingOperation = NO;
+}
+
+#pragma mark - Internal Methods
 
 -(UIImage *)getImageWithURLString:(NSString*)urlString
 {
@@ -59,50 +121,15 @@
     return image;
 }
 
--(void)joinImages:(CDVInvokedUrlCommand*)command
+-(NSString *)resizeAndEncodeImage:(UIImage *)image withSize:(float)size
 {
+    //Resize the image
+    UIImage *sizedImage = [ImageService resizeImage:image withSizeInMB:size];
     
-    // Set the hasPendingOperation field to prevent the webview from crashing
-    self.hasPendingOperation = YES;
+    NSData *imageData = UIImageJPEGRepresentation(sizedImage, 1.0);
+    NSString *encodedImage = [imageData base64Encoding];
     
-    if (command.arguments.count < 3) {
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Need 2 images and size"] callbackId:command.callbackId];
-        
-        // Unset the self.hasPendingOperation property
-        self.hasPendingOperation = NO;
-        
-        return;
-    }
-    
-    //Check for success of loading images.
-    if (self.leftImage == nil || self.rightImage == nil) {
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"At least one image could not load."] callbackId:command.callbackId];
-        
-        // Unset the self.hasPendingOperation property
-        self.hasPendingOperation = NO;
-        
-        return;
-    }
-    
-    float size = [[command.arguments objectAtIndex:2] floatValue];
-    
-    //Stitch images together...
-    UIImage* merged = [ImageService mergeImage:self.leftImage withImage:self.rightImage];
-    
-    //Resize the image to be under 5MB
-    merged = [ImageService resizeImage:merged withSizeInMB:size];
-    
-    NSData *mergedData = UIImageJPEGRepresentation(merged, 1.0);
-    NSString *encodedMerged = [mergedData base64Encoding];
-    
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:encodedMerged] callbackId:command.callbackId];
-    
-    // Unset the self.hasPendingOperation property
-    self.hasPendingOperation = NO;
-    
-    return;
-
+    return encodedImage;
 }
-
 
 @end

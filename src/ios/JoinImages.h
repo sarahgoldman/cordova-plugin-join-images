@@ -16,5 +16,7 @@
  **/
 -(void)joinImagesWithData:(CDVInvokedUrlCommand*)command;
 -(void)joinImagesWithURLs:(CDVInvokedUrlCommand*)command;
+-(void)resizeImageFromURL:(CDVInvokedUrlCommand*)command;
+-(void)resizeImageFromData:(CDVInvokedUrlCommand*)command;
 
 @end

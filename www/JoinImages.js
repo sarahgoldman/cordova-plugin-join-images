@@ -60,7 +60,7 @@ module.exports = {
 		// options
 		this.sourceType = options.sourceType; // source type, either url or base64 (required)
 		
-		this.firstImage = options.firstImage; // image data or url string (required)
+		this.image = options.image; // image data or url string (required)
 		
 		this.size = (options.size && options.size > 0) ? options.size : 5; // file output size (MB), default to 5
 		
@@ -88,7 +88,7 @@ module.exports = {
 		// use one of the resize methods based on the source type
 		var	method = (this.sourceType === this.URL) ? this.IOS_RESIZE_METHOD_URL : this.IOS_RESIZE_METHOD_BASE64;
 		// pass first image and the size
-		var	args = [this.firstImage, this.size];
+		var	args = [this.image, this.size];
 		
 		// make the call
         cordova.exec(this.successCallback, this.errorCallback, this.IOS_CLASS, method, args);

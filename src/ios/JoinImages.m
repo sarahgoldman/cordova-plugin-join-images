@@ -65,8 +65,8 @@
     // Set the hasPendingOperation field to prevent the webview from crashing
     self.hasPendingOperation = YES;
     
-    if (command.arguments.count < 2) {
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Need 2 images"] callbackId:command.callbackId];
+    if (command.arguments.count < 3) {
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Need 2 images and size"] callbackId:command.callbackId];
         
         // Unset the self.hasPendingOperation property
         self.hasPendingOperation = NO;
@@ -84,11 +84,13 @@
         return;
     }
     
+    float size = [[command.arguments objectAtIndex:2] floatValue];
+    
     //Stitch images together...
     UIImage* merged = [ImageService mergeImage:self.leftImage withImage:self.rightImage];
     
     //Resize the image to be under 5MB
-    merged = [ImageService resizeImage:merged withSizeInMB:5.0];
+    merged = [ImageService resizeImage:merged withSizeInMB:size];
     
     NSData *mergedData = UIImageJPEGRepresentation(merged, 1.0);
     NSString *encodedMerged = [mergedData base64Encoding];

@@ -15,6 +15,8 @@ module.exports = {
 
 		this.rightImage = options.rightImage; // right image file path (required)
 		
+		this.size = (options.size && options.size > 0) ? options.size || 5.0; // file output size in MB, default to 5MB
+		
 		// make sure callbacks are functions or reset to null
 		this.successCallback = (options.success && typeof(options.success) === 'function') ? options.success : null; 
 
@@ -43,7 +45,7 @@ module.exports = {
 		}
 		
 		// arguments for ios method
-		var args = [this.leftImage, this.rightImage]; 
+		var args = [this.leftImage, this.rightImage, this.size]; 
 		
 		// depending on the type of data, set the appropriate ios method to call
 		var method = (this.type === this.URL_TYPE) ? this.URL_IOS_METHOD : this.BASE64_IOS_METHOD;

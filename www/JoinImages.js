@@ -15,8 +15,6 @@ module.exports = {
 
 		this.rightImage = options.rightImage; // right image file path (required)
 		
-		this.destination = options.destination; // destination file name (required)
-		
 		// make sure callbacks are functions or reset to null
 		this.successCallback = (options.success && typeof(options.success) === 'function') ? options.success : null; 
 
@@ -45,7 +43,7 @@ module.exports = {
 		}
 		
 		// arguments for ios method
-		var args = [this.leftImage, this.rightImage, this.destination]; 
+		var args = [this.leftImage, this.rightImage]; 
 		
 		// depending on the type of data, set the appropriate ios method to call
 		var method = (this.type === this.URL_TYPE) ? this.URL_IOS_METHOD : this.BASE64_IOS_METHOD;

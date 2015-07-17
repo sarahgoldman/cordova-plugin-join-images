@@ -74,10 +74,6 @@
         return;
     }
     
-    //Get Documents Directory
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    
     //Check for success of loading images.
     if (self.leftImage == nil || self.rightImage == nil) {
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"At least one image could not load."] callbackId:command.callbackId];
@@ -94,26 +90,16 @@
     //Resize the image to be under 5MB
     merged = [ImageService resizeImage:merged withSizeInMB:5.0];
     
-    //Create fileName and find path
-    NSString* fileName = [command.arguments objectAtIndex:2];
+    NSData *mergedData = UIImageJPEGRepresentation(merged, 1.0);
+    NSString *encodedMerged = [mergedData base64Encoding];
     
-    //Save completed image
-    NSString* imagePath = [ImageService saveImage:merged withName:fileName andPath:documentsDirectory];
-    
-    //Check for success of saving the image
-    if (imagePath == nil) {
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not save merged photo."] callbackId:command.callbackId];
-        
-        // Unset the self.hasPendingOperation property
-        self.hasPendingOperation = NO;
-        
-        return;
-    }
-    
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%@/%@", @"file://", imagePath]] callbackId:command.callbackId];
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:encodedMerged] callbackId:command.callbackId];
     
     // Unset the self.hasPendingOperation property
     self.hasPendingOperation = NO;
+    
+    return;
+
 }
 
 

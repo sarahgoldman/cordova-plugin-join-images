@@ -24,6 +24,8 @@
 		<source-file src="src/ios/JoinImages.m" />
 		<header-file src="src/ios/ImageService.h" />
 		<source-file src="src/ios/ImageService.m" />
+		<header-file src="src/ios/NSData+Base64.h" />
+		<source-file src="src/ios/NSData+Base64.m" />
 	</platform>
 
 </plugin>

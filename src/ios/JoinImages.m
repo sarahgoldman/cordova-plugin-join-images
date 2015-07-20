@@ -22,7 +22,7 @@
 
 @implementation JoinImages
 
--(void)joinImagesWithData:(CDVInvokedUrlCommand *)command
+-(void)joinImagesFromData:(CDVInvokedUrlCommand *)command
 {
     
     self.hasPendingOperation = YES;
@@ -46,7 +46,7 @@
     
 }
 
--(void)joinImagesWithURLs:(CDVInvokedUrlCommand *)command
+-(void)joinImagesFromURLs:(CDVInvokedUrlCommand *)command
 {
     self.hasPendingOperation = YES;
     

@@ -27,5 +27,18 @@
 		<header-file src="src/ios/NSData+Base64.h" />
 		<source-file src="src/ios/NSData+Base64.m" />
 	</platform>
+	
+	<!-- android -->
+	<platform name="android">
+
+		<config-file target="res/xml/config.xml" parent="/*">
+			<feature name="JoinImages">
+				<param name="android-package" value="com.sgoldm.plugin.JoinImages"/>
+			</feature>
+		</config-file>
+
+		<source-file src="src/android/JoinImages.java" target-dir="src/com/sgoldm/plugin/"/>
+		<source-file src="src/android/ImageService.java" target-dir="src/com/sgoldm/plugin/"/>
+	</platform>
 
 </plugin>

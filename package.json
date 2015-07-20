@@ -5,7 +5,8 @@
   "cordova": {
     "id": "cordova-plugin-join-images",
     "platforms": [
-      "ios"
+      "ios",
+	  "android"
     ]
   },
   "repository": {
@@ -15,11 +16,15 @@
   "keywords": [
     "cordova",
     "cordova-ios",
+    "cordova-android",
     "image",
     "join",
 	"merge",
 	"photo"
   ],
-  "author": "Sarah Goldman",
+  "contributors": [
+	"Sarah Goldman",
+	"Oron Carty"
+  ],
   "license": "MIT"
 }

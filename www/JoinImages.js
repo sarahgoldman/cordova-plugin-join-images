@@ -3,11 +3,11 @@ module.exports = {
 	// internals
 	URL: 'url',
 	BASE64: 'base64',
-	IOS_CLASS: 'JoinImages',
-	IOS_JOIN_METHOD_URL: 'joinImagesWithURLs',
-	IOS_JOIN_METHOD_BASE64: 'joinImagesWithData',
-	IOS_RESIZE_METHOD_URL: 'resizeImageFromURL',
-	IOS_RESIZE_METHOD_BASE64: 'resizeImageFromData',
+	CLASS: 'JoinImages',
+	JOIN_METHOD_URL: 'joinImagesFromURLs',
+	JOIN_METHOD_BASE64: 'joinImagesFromData',
+	RESIZE_METHOD_URL: 'resizeImageFromURL',
+	RESIZE_METHOD_BASE64: 'resizeImageFromData',
 	
 	join: function(options){
 		
@@ -44,12 +44,12 @@ module.exports = {
 		}
 		
 		// use one of the join methods based on the source type
-		var	method = (this.sourceType === this.URL) ? this.IOS_JOIN_METHOD_URL : this.IOS_JOIN_METHOD_BASE64;
+		var	method = (this.sourceType === this.URL) ? this.JOIN_METHOD_URL : this.JOIN_METHOD_BASE64;
 		// pass both images and the size
 		var	args = [this.firstImage, this.secondImage, this.size];
 		
 		// make the call
-        cordova.exec(this.successCallback, this.errorCallback, this.IOS_CLASS, method, args);
+        cordova.exec(this.successCallback, this.errorCallback, this.CLASS, method, args);
 
 	},
 	
@@ -86,12 +86,12 @@ module.exports = {
 		}
 		
 		// use one of the resize methods based on the source type
-		var	method = (this.sourceType === this.URL) ? this.IOS_RESIZE_METHOD_URL : this.IOS_RESIZE_METHOD_BASE64;
+		var	method = (this.sourceType === this.URL) ? this.RESIZE_METHOD_URL : this.RESIZE_METHOD_BASE64;
 		// pass first image and the size
 		var	args = [this.image, this.size];
 		
 		// make the call
-        cordova.exec(this.successCallback, this.errorCallback, this.IOS_CLASS, method, args);
+        cordova.exec(this.successCallback, this.errorCallback, this.CLASS, method, args);
 
 	}
 	

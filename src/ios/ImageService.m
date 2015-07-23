@@ -42,25 +42,6 @@
     return picture1;
 }
 
-+ (NSString*) saveImage:(UIImage *) image withName:(NSString*) fileName andPath:(NSString*) filePath {
-    //Get a jpeg representation of the image
-    NSData *jpegData = UIImageJPEGRepresentation(image, 1);
-    
-    //Combine the path components
-    NSString* fullPath = [filePath stringByAppendingPathComponent:fileName];
-    
-    //Write the file
-    BOOL success = [jpegData writeToFile:fullPath atomically:YES];
-    
-    //Check for success
-    if (!success) {
-        NSLog(@"Failed to save image...");
-        return nil;
-    }
-    
-    return fullPath;
-}
-
 + (UIImage*) resizeImage:(UIImage *)image withSizeInMB:(double)size{
     //Convert the size given in MB to bytes
     NSData* jpegImage = [self resizeImage:image withSizeInBytes:(size*1048576)];//1048576 is 2^20

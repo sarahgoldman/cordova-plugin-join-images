@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-join-images",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Join Images Cordova Plugin",
   "cordova": {
     "id": "cordova-plugin-join-images",

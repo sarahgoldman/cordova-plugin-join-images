@@ -1,4 +1,4 @@
-package com.sgoldm.plugin;
+package com.sgoldm.plugin.joinImages;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +22,9 @@ public class JoinImages extends CordovaPlugin {
     public static final String ACTION_RESIZE_IMAGE_FROM_DATA = "resizeImageFromData";
     public static final int MEGABYTES_MULTIPLIER = 1048576;
     public static final double SCALE_FACTOR = 0.8;
+    public static final double DEFAULT_MB_LIMIT = 5.0;
+    public static final int QUALITY = 90;
+    public static final Bitmap.CompressFormat COMPRESS_FORMAT = Bitmap.CompressFormat.JPEG;
     
     /**
      * Method that connects the javascript code to the native android code.
@@ -59,45 +62,29 @@ public class JoinImages extends CordovaPlugin {
      * @return the encoded string as a Base64
      */
     private String joinImagesFromData(JSONArray args) {
-        String firstImageDataString = null;
-        String secondImageDataString = null;
-        double sizeLimitInBytes = 0;
-        try {
-            firstImageDataString = args.getString(0);
-            secondImageDataString = args.getString(1);
-            sizeLimitInBytes = args.getDouble(2);
-            sizeLimitInBytes *= MEGABYTES_MULTIPLIER;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        
-        byte[] decodedByteArrayFirstArg = Base64.decode(firstImageDataString, Base64.DEFAULT);
-        byte[] decodedByteArraySecondArg = Base64.decode(secondImageDataString, Base64.DEFAULT);
-        Bitmap bitmapFirstArg = BitmapFactory.decodeByteArray(decodedByteArrayFirstArg, 0, decodedByteArrayFirstArg.length);
-        Bitmap bitmapSecondArg = BitmapFactory.decodeByteArray(decodedByteArraySecondArg, 0, decodedByteArraySecondArg.length);
-        
+        String firstImageDataString = args.optString(0, "");
+        String secondImageDataString = args.optString(1, "");
+        double sizeLimitInBytes = args.optDouble(2, DEFAULT_MB_LIMIT) * MEGABYTES_MULTIPLIER;
+
+        // get the images as bitmaps
+        Bitmap bitmapFirstArg = getBitmapFromEncodedString(firstImageDataString);
+        Bitmap bitmapSecondArg = getBitmapFromEncodedString(secondImageDataString);
+
+        // use the height of the taller image
         int height = (bitmapFirstArg.getHeight() > bitmapSecondArg.getHeight()) ? bitmapFirstArg.getHeight():bitmapSecondArg.getHeight();
+        // and combine the widths because they will be joined horizontally
         int width = bitmapFirstArg.getWidth() + bitmapSecondArg.getWidth();
-        
+
+        // create a new bitmap of the joined images
         Bitmap bmOverlay = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        int sizeOfBitmapInBytes = width * height * 3;
         Canvas canvas = new Canvas(bmOverlay);
+		// place the first image at 0,0
         canvas.drawBitmap(bitmapFirstArg, 0f, 0f, null);
+		// place the second image right next to it (firstWidth, 0)
         canvas.drawBitmap(bitmapSecondArg, bitmapFirstArg.getWidth(), 0f, null);
-        
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        int quality = 90;
-        while(sizeOfBitmapInBytes > sizeLimitInBytes) {
-            bmOverlay = getResizedBitmap(bmOverlay, (int)(bmOverlay.getHeight() * SCALE_FACTOR), (int)(bmOverlay.getWidth() * SCALE_FACTOR));
-            sizeOfBitmapInBytes = bmOverlay.getRowBytes() * bmOverlay.getHeight();
-        }
-        bmOverlay.compress(Bitmap.CompressFormat.JPEG, quality, stream);
-        byte[] byteArray = stream.toByteArray();
-        
-        String decodedImageAsAString = Base64.encodeToString(byteArray, Base64.DEFAULT);
-        bmOverlay.recycle();
-        
-        return decodedImageAsAString;
+
+        // scale it down and encode it, return that string
+        return scaleAndEncodeBitmap(bmOverlay, sizeLimitInBytes);
     }
     
     /**
@@ -107,39 +94,47 @@ public class JoinImages extends CordovaPlugin {
      * @return the encoded string as a Base64
      */
     private String resizeImageFromData(JSONArray args) {
-        String imageDataString = null;
-        double sizeLimitInBytes = 0;
-        try {
-            imageDataString = args.getString(0);
-            sizeLimitInBytes = args.getDouble(1);
-            sizeLimitInBytes *= MEGABYTES_MULTIPLIER;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        byte[] decodedByteArray = Base64.decode(imageDataString, Base64.DEFAULT);
-        Bitmap bitmapOfImage = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
-        
-        
-        Bitmap bmOverlay = Bitmap.createBitmap(bitmapOfImage.getWidth(), bitmapOfImage.getHeight(), Bitmap.Config.ARGB_8888);
-        int sizeOfBitmapInBytes = bitmapOfImage.getWidth() * bitmapOfImage.getHeight() * 3;
-        Canvas canvas = new Canvas(bmOverlay);
-        canvas.drawBitmap(bitmapOfImage, 0f, 0f, null);
-        
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        int quality = 90;
-        while(sizeOfBitmapInBytes > sizeLimitInBytes) {
-            bmOverlay = getResizedBitmap(bmOverlay, (int) (bmOverlay.getHeight() * SCALE_FACTOR), (int) (bmOverlay.getWidth() * SCALE_FACTOR));
-            sizeOfBitmapInBytes = bmOverlay.getRowBytes() * bmOverlay.getHeight();
-        }
-        bmOverlay.compress(Bitmap.CompressFormat.JPEG, quality, stream);
-        byte[] byteArray = stream.toByteArray();
-        
-        String decodedImageAsAString = Base64.encodeToString(byteArray, Base64.DEFAULT);
-        bmOverlay.recycle();
-        
-        return decodedImageAsAString;
+
+        String imageDataString = args.optString(0, "");
+        double sizeLimitInBytes = args.optDouble(1, DEFAULT_MB_LIMIT) * MEGABYTES_MULTIPLIER;
+
+        // get the image as bitmap
+        Bitmap bitmapOfImage = getBitmapFromEncodedString(imageDataString);
+
+        // scale it down and encode it, return that string
+        return scaleAndEncodeBitmap(bitmapOfImage, sizeLimitInBytes);
     }
-    
+
+    /**
+     * Method that scales down a bitmap and returns it as a base64 encoded string
+     *
+     * @param bitmap the bitmap passed in
+     * @param sizeLimitInBytes the size limit in bytes
+     * @return the scaled down bitmap as an encoded string
+     */
+    private String scaleAndEncodeBitmap(Bitmap bitmap, double sizeLimitInBytes) {
+        // get the current size in bytes
+        int sizeOfBitmapInBytes = bitmap.getRowBytes() * bitmap.getHeight();
+        // create output stream
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        // while its outside of the size limit
+        while(sizeOfBitmapInBytes > sizeLimitInBytes) {
+            // scale it down and check the size again
+            bitmap = getResizedBitmap(bitmap, (int) (bitmap.getHeight() * SCALE_FACTOR), (int) (bitmap.getWidth() * SCALE_FACTOR));
+            sizeOfBitmapInBytes = bitmap.getRowBytes() * bitmap.getHeight();
+        }
+        // compress it and get byte array
+        bitmap.compress(COMPRESS_FORMAT, QUALITY, stream);
+        byte[] byteArray = stream.toByteArray();
+
+        // encode it to base64 string, recycle the bitmap and return the string
+        String encodedImageAsAString = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        bitmap.recycle();
+
+        return encodedImageAsAString;
+
+    }
+
     /**
      * Method that returns a resized bitmap based on the height and width passed in.
      *
@@ -160,5 +155,17 @@ public class JoinImages extends CordovaPlugin {
         // recreate the new Bitmap
         Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);
         return resizedBitmap;
+    }
+
+    /**
+     * Method that returns a bitmap from a base64 string
+     *
+     * @param encodedString the encoded data passed in
+     * @return bitmap Of image
+     */
+    private Bitmap getBitmapFromEncodedString(String encodedString) {
+        byte[] decodedByteArray = Base64.decode(encodedString, Base64.DEFAULT);
+        Bitmap bitmapOfImage = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
+        return bitmapOfImage;
     }
 }

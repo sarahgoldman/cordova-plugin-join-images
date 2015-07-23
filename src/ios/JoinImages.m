@@ -14,7 +14,6 @@
 
 @property (readwrite, assign) BOOL hasPendingOperation;
 
--(UIImage *)getImageWithURLString:(NSString*)urlString;
 -(UIImage *)getImageWithDataString:(NSString*)dataString;
 -(NSString *)resizeAndEncodeImage:(UIImage *)image withSize:(float)size;
 
@@ -46,47 +45,6 @@
     
 }
 
--(void)joinImagesFromURLs:(CDVInvokedUrlCommand *)command
-{
-    self.hasPendingOperation = YES;
-    
-    //Fetch images from data string arguments...
-    UIImage *leftImage = [self getImageWithURLString:[command.arguments objectAtIndex:0]];
-    UIImage *rightImage = [self getImageWithURLString:[command.arguments objectAtIndex:1]];
-    float size = [[command.arguments objectAtIndex:2] floatValue];
-    
-    //Stitch images together...
-    UIImage* joined = [ImageService mergeImage:leftImage withImage:rightImage];
-    
-    //Resize and encode
-    NSString *encodedImage = [self resizeAndEncodeImage:joined withSize:size];
-    
-    // return encoded joinedImage
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:encodedImage] callbackId:command.callbackId];
-    
-    // Unset the self.hasPendingOperation property
-    self.hasPendingOperation = NO;
-    
-}
-
--(void)resizeImageFromURL:(CDVInvokedUrlCommand *)command
-{
-    self.hasPendingOperation = YES;
-    
-    //Fetch image from url string arguments...
-    UIImage *image = [self getImageWithURLString:[command.arguments objectAtIndex:0]];
-    float size = [[command.arguments objectAtIndex:1] floatValue];
-    
-    //Resize and encode
-    NSString *encodedImage = [self resizeAndEncodeImage:image withSize:size];
-    
-    // return encoded image
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:encodedImage] callbackId:command.callbackId];
-    
-    // Unset the self.hasPendingOperation property
-    self.hasPendingOperation = NO;
-}
-
 -(void)resizeImageFromData:(CDVInvokedUrlCommand *)command
 {
     self.hasPendingOperation = YES;
@@ -106,13 +64,6 @@
 }
 
 #pragma mark - Internal Methods
-
--(UIImage *)getImageWithURLString:(NSString*)urlString
-{
-    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlString]];
-    UIImage *image = [UIImage imageWithData:imageData];
-    return image;
-}
 
 -(UIImage *)getImageWithDataString:(NSString*)dataString
 {

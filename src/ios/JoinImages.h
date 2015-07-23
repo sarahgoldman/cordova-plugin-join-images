@@ -12,11 +12,11 @@
 
 #pragma mark - Plugin Method
 /**
- * Called by Cordova. Takes two photos provided via two file paths, and merges them into one photo saved in the documents directory with the filename provided as the third argument.
+ * Called by Cordova. Takes one or two photos as encoded strings, 
+ * and merges them into one photo if needed, scales it to the
+ * given size limit and returns it as an encoded string.
  **/
 -(void)joinImagesFromData:(CDVInvokedUrlCommand*)command;
--(void)joinImagesFromURLs:(CDVInvokedUrlCommand*)command;
--(void)resizeImageFromURL:(CDVInvokedUrlCommand*)command;
 -(void)resizeImageFromData:(CDVInvokedUrlCommand*)command;
 
 @end

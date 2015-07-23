@@ -1,24 +1,18 @@
 module.exports = {
 	
 	// internals
-	URL: 'url',
-	BASE64: 'base64',
 	CLASS: 'JoinImages',
-	JOIN_METHOD_URL: 'joinImagesFromURLs',
-	JOIN_METHOD_BASE64: 'joinImagesFromData',
-	RESIZE_METHOD_URL: 'resizeImageFromURL',
-	RESIZE_METHOD_BASE64: 'resizeImageFromData',
+	JOIN_METHOD: 'joinImagesFromData',
+	RESIZE_METHOD: 'resizeImageFromData',
 	
 	join: function(options){
 		
 		options = options || {};
 		
 		// options
-		this.sourceType = options.sourceType; // source type, either url or base64 (required)
-		
-		this.firstImage = options.firstImage; // first image data or url string (required)
+		this.firstImage = options.firstImage; // first image data, base64 string (required)
 
-		this.secondImage = options.secondImage; // second image data or url string (required)
+		this.secondImage = options.secondImage; // second image data, base64 string (required)
 		
 		this.size = (options.size && options.size > 0) ? options.size : 5; // file output size (MB), default to 5
 		
@@ -27,29 +21,19 @@ module.exports = {
 
 		this.errorCallback = (options.error && typeof(options.error) === 'function') ? options.error : null;
 		
-		// make sure the source type and images are set	
-		if (!this.sourceType || !this.firstImage || !this.secondImage) {
+		// make sure the images are set	
+		if (!this.firstImage || !this.secondImage) {
 			if (this.errorCallback) {
-				this.errorCallback("Parameters 'sourceType', 'firstImage' and 'secondImage' are required.");
+				this.errorCallback("Parameters 'firstImage' and 'secondImage' are required.");
 			}
 			return false;
 		}
 		
-		// make sure source type is one of the two defined types
-		if (this.sourceType !== this.URL && this.sourceType !== this.BASE64) {
-			if (this.errorCallback) {
-				this.errorCallback("Parameter 'sourceType' must be 'url' or 'base64'.");
-			}
-			return false;
-		}
-		
-		// use one of the join methods based on the source type
-		var	method = (this.sourceType === this.URL) ? this.JOIN_METHOD_URL : this.JOIN_METHOD_BASE64;
 		// pass both images and the size
 		var	args = [this.firstImage, this.secondImage, this.size];
 		
 		// make the call
-        cordova.exec(this.successCallback, this.errorCallback, this.CLASS, method, args);
+        cordova.exec(this.successCallback, this.errorCallback, this.CLASS, this.JOIN_METHOD, args);
 
 	},
 	
@@ -58,9 +42,7 @@ module.exports = {
 		options = options || {};
 		
 		// options
-		this.sourceType = options.sourceType; // source type, either url or base64 (required)
-		
-		this.image = options.image; // image data or url string (required)
+		this.image = options.image; // image data, base64 string (required)
 		
 		this.size = (options.size && options.size > 0) ? options.size : 5; // file output size (MB), default to 5
 		
@@ -69,29 +51,19 @@ module.exports = {
 
 		this.errorCallback = (options.error && typeof(options.error) === 'function') ? options.error : null;
 		
-		// make sure the source type and image are set	
-		if (!this.sourceType || !this.image) {
+		// make sure the image is set	
+		if (!this.image) {
 			if (this.errorCallback) {
-				this.errorCallback("Parameters 'sourceType' and 'image' are required.");
+				this.errorCallback("Parameter 'image' is required.");
 			}
 			return false;
 		}
 		
-		// make sure source type is one of the two defined types
-		if (this.sourceType !== this.URL && this.sourceType !== this.BASE64) {
-			if (this.errorCallback) {
-				this.errorCallback("Parameter 'sourceType' must be 'url' or 'base64'.");
-			}
-			return false;
-		}
-		
-		// use one of the resize methods based on the source type
-		var	method = (this.sourceType === this.URL) ? this.RESIZE_METHOD_URL : this.RESIZE_METHOD_BASE64;
 		// pass first image and the size
 		var	args = [this.image, this.size];
 		
 		// make the call
-        cordova.exec(this.successCallback, this.errorCallback, this.CLASS, method, args);
+        cordova.exec(this.successCallback, this.errorCallback, this.CLASS, this.RESIZE_METHOD, args);
 
 	}
 	

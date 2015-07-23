@@ -12,15 +12,6 @@
 @interface ImageService : NSObject
 
 /**
- * Saves an image at the given path with the given name as JPEG format
- * @param image     image to save
- * @param fileName  name for the image
- * @param filePath  path to save the image
- * @return the combined fileName and filePath
- **/
-+ (NSString*) saveImage:(UIImage*)image withName:(NSString*)fileName andPath:(NSString*)filePath;
-
-/**
  * Merges two UIImages. Returns one image with image1 to the left of image2.
  * @param image1    first image
  * @param image2    second image

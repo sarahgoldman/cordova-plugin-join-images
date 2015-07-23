@@ -1,7 +1,7 @@
 Join Images plugin for Cordova
 ======================================================
 
-This plugin can be used to join two images into one image and resize it, or just resize one image. It returns the final image as a base 64 encoded JPG.
+This plugin can be used to join two images into one image and resize it, or just resize one image. It returns the final image as a base64 encoded JPG.
 
 ## Usage
 
@@ -14,11 +14,9 @@ The default options object
 ```
 var options = {
 
-	sourceType: null, 	// must be either 'url' or 'base64' (required)
+	firstImage: null, 	// first image, base64 string (required)
 
-	firstImage: null, 	// first image url string or base64 string (required)
-
-	secondImage: null, 	// second image url string or base64 string (required)
+	secondImage: null, 	// second image, base64 string (required)
 
 	size: 5, 			// size of final image in MB
 
@@ -39,9 +37,7 @@ The default options object
 ```
 var options = {
 
-	sourceType: null, 	// must be either 'url' or 'base64' (required)
-
-	image: null, 		// image url string or base64 string (required)
+	image: null, 		// image, base64 string (required)
 
 	size: 5, 			// size of final image in MB
 
@@ -57,9 +53,8 @@ var options = {
 
 ```
 plugins.JoinImages.resize({
-	sourceType: 'url',
-	image: 'http://www.myhoundhaven.org/images/Golden%20Retriever.jpg',
-	size: 1,
+	image: 'dataString',
+	size: 1.5,
 	success: function(encodedImage){
 		document.getElementById('result').src = 'data:image/jpeg;base64,'+encodedImage;
 	},

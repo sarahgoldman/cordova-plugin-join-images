@@ -1,5 +1,5 @@
 //
-//  NSData+Base64.h
+//  NSData+JIBase64.h
 //  base64
 //
 //  Created by Matt Gallagher on 2009/06/03.

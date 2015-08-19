@@ -1,5 +1,5 @@
 //
-//  ImageService.h
+//  JIImageService.h
 //  PictureStitch
 //
 //  Created by Scott Magee on 6/12/15.

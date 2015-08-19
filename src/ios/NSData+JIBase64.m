@@ -1,5 +1,5 @@
 //
-//  NSData+Base64.m
+//  NSData+JIBase64.m
 //  base64
 //
 //  Created by Matt Gallagher on 2009/06/03.
@@ -21,7 +21,7 @@
 //     distribution.
 //
 
-#import "NSData+Base64.h"
+#import "NSData+JIBase64.h"
 
 //
 // Mapping from 6 bit pattern to ASCII character.

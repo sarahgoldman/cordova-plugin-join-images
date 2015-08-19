@@ -1,12 +1,12 @@
 //
-//  ImageService.m
+//  JIImageService.m
 //  PictureStitch
 //
 //  Created by Scott Magee on 6/12/15.
 //  Copyright (c) 2015 Scott Magee. All rights reserved.
 //
 
-#import "ImageService.h"
+#import "JIImageService.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 
 @implementation ImageService

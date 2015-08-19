@@ -6,9 +6,9 @@
 //
 //
 
-#import "NSData+Base64.h"
+#import "NSData+JIBase64.h"
 #import "JoinImages.h"
-#import "ImageService.h"
+#import "JIImageService.h"
 
 @interface JoinImages ()
 

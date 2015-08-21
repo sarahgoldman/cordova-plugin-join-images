@@ -3,10 +3,12 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	id="cordova-plugin-join-images"
-	version="1.0.1">
+	version="1.0.2">
 	<name>JoinImages</name>
 	<description>Join Images Cordova Plugin</description>
 	<license>MIT</license>
+
+	<dependency id="cordova-plugin-ios-base64" url="https://github.com/sarahgoldman/cordova-plugin-ios-base64" />
 
 	<js-module src="www/JoinImages.js" name="JoinImages">
 		<clobbers target="plugins.JoinImages" />
@@ -24,8 +26,6 @@
 		<source-file src="src/ios/JoinImages.m" />
 		<header-file src="src/ios/JIImageService.h" />
 		<source-file src="src/ios/JIImageService.m" />
-		<header-file src="src/ios/NSData+JIBase64.h" />
-		<source-file src="src/ios/NSData+JIBase64.m" />
 	</platform>
 	
 	<!-- android -->

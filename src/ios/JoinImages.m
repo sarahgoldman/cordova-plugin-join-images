@@ -6,7 +6,7 @@
 //
 //
 
-#import "NSData+JIBase64.h"
+#import "NSData+Base64.h"
 #import "JoinImages.h"
 #import "JIImageService.h"
 
